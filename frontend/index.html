@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CVInsight — Resume Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="page">
+ 
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0b0c10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+          <line x1="9" y1="17" x2="13" y2="17"/>
+        </svg>
+      </div>
+      <span class="logo-text">CV<span>Insight</span></span>
+    </div>
+    <span class="badge">AI-Powered</span>
+  </header>
+ 
+  <!-- Upload Section -->
+  <p class="section-label">Upload Resume</p>
+ 
+  <div class="upload-card" id="uploadCard">
+    <input type="file" id="fileInput" accept=".pdf,.docx" />
+    <div class="upload-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17,8 12,3 7,8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+    </div>
+    <div class="upload-title">Drop your resume here</div>
+    <div class="upload-sub">or <span>browse files</span> from your computer</div>
+    <div class="file-types">
+      <span class="file-chip">PDF</span>
+      <span class="file-chip">DOCX</span>
+    </div>
+    <div class="file-selected-name" id="fileName"></div>
+  </div>
+ 
+  <!-- Job Description -->
+  <div class="jd-section">
+    <div class="jd-label">
+      Job Description
+      <span class="optional-tag">Optional</span>
+    </div>
+    <textarea id="jobDesc" placeholder="Paste a job description to check how well your resume matches the role…"></textarea>
+  </div>
+ 
+  <!-- Analyze Button -->
+  <button class="analyze-btn" id="analyzeBtn" onclick="handleFile()" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    Analyze Resume
+  </button>
+ 
+  <!-- Error -->
+  <div class="error-bar" id="errorBar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span id="errorMsg"></span>
+  </div>
+ 
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="loader-dots">
+      <div class="loader-dot"></div>
+      <div class="loader-dot"></div>
+      <div class="loader-dot"></div>
+    </div>
+    <div class="loader-text">Analyzing your resume…</div>
+  </div>
+ 
+  <!-- Results -->
+  <div id="results">
+    <div class="divider"></div>
+ 
+    <div class="results-header">
+      <div>
+        <div class="results-title">Analysis Results</div>
+        <div class="results-sub" id="resultsFileName"></div>
+      </div>
+    </div>
+ 
+    <!-- Score + Metrics -->
+    <div class="score-grid">
+ 
+      <!-- Main Score -->
+      <div class="score-card main" id="mainScoreCard">
+        <div class="score-ring">
+          <svg viewBox="0 0 100 100">
+            <circle class="track" cx="50" cy="50" r="45"/>
+            <circle class="fill" id="scoreArc" cx="50" cy="50" r="45"/>
+          </svg>
+          <div class="score-center">
+            <div class="score-number" id="scoreNum">0</div>
+            <div class="score-label">/ 100</div>
+          </div>
+        </div>
+        <div class="score-info">
+          <div class="score-grade" id="scoreGrade">—</div>
+          <div class="score-desc" id="scoreDesc">—</div>
+        </div>
+      </div>
+ 
+      <!-- Suggestions Count -->
+      <div class="score-card metric-card">
+        <div class="metric-icon" style="background:rgba(255,190,61,0.12);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#ffbe3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div class="metric-val" id="suggCount">—</div>
+        <div class="metric-name">Improvements found</div>
+      </div>
+ 
+      <!-- Roles Count -->
+      <div class="score-card metric-card">
+        <div class="metric-icon" style="background:rgba(90,180,245,0.12);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </div>
+        <div class="metric-val" id="rolesCount">—</div>
+      <div class="metric-name">Suggested roles</div>
+ 
+    </div>
+ 
+    <!-- Suggestions -->
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-title-dot" style="background:var(--amber);"></span>
+        Improvement Suggestions
+      </div>
+      <div id="suggestionsList"></div>
+    </div>
+ 
+    <!-- Suggested Roles -->
+    <div class="info-card" id="suggestedRolesCard">
+      <div class="card-title">
+        <span class="card-title-dot" style="background:var(--blue);"></span>
+        Suggested Roles
+      </div>
+      <div class="roles-grid" id="suggestedRolesList"></div>
+    </div>
+
+    <!-- Detected Skills -->
+    <div class="info-card" id="skillsCard">
+      <div class="card-title">
+        <span class="card-title-dot" style="background:var(--accent);"></span>
+        Detected Skills
+      </div>
+      <div class="roles-grid" id="skillsList"></div>
+    </div>
+ 
+    <!-- Job Match (conditionally shown) -->
+    <div class="info-card" id="jobMatchCard" style="display:none;">
+      <div class="card-title">
+        <span class="card-title-dot" style="background:var(--accent);"></span>
+        Job Match Analysis
+      </div>
+      <div class="match-bar-wrap">
+        <div class="match-bar-top">
+          <span class="match-bar-label">Match Score</span>
+          <span class="match-bar-val" id="matchVal">0%</span>
+        </div>
+        <div class="match-bar"><div class="match-bar-fill" id="matchFill"></div></div>
+      </div>
+      <div class="missing-keywords" id="missingSection" style="display:none;">
+        <div class="missing-title">Missing Keywords</div>
+        <div class="keyword-tags" id="missingKeywords"></div>
+      </div>
+    </div>
+
+    <!-- LLM Insights (conditionally shown) -->
+    <div class="info-card" id="llmCard" style="display:none;">
+      <div class="card-title">
+        <span class="card-title-dot" style="background:rgba(200,245,90,0.7);"></span>
+        AI Insights
+      </div>
+      <div class="llm-content" id="llmContent"></div>
+    </div>
+ 
+  </div><!-- /results -->
+</div><!-- /page -->
+ 
+<script src="/static/script.js"></script>
+</body>
+</html>
