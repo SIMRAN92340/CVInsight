@@ -4,7 +4,7 @@ A modern AI-powered resume analyzer that provides scoring, skill detection, job 
 
 ## 🚀 Quick Start
 
-### 1. Prerequisites
+### 1.  Prerequisites
 - Python 3.8+
 - Dependencies installed (see `requirements.txt`)
 
